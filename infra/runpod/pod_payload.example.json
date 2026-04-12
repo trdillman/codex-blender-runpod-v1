@@ -1,0 +1,17 @@
+{
+  "name": "codex-blender-sandbox",
+  "cloudType": "SECURE",
+  "computeType": "GPU",
+  "gpuCount": 1,
+  "gpuTypeIds": [
+    "NVIDIA GeForce RTX 4070 Ti",
+    "NVIDIA GeForce RTX 3090"
+  ],
+  "gpuTypePriority": "availability",
+  "containerDiskInGb": 40,
+  "volumeInGb": 80,
+  "volumeMountPath": "/workspace",
+  "imageName": "ghcr.io/your-org/codex-blender-runpod:main",
+  "ports": ["8080/http", "3001/http", "22/tcp"],
+  "supportPublicIp": true
+}

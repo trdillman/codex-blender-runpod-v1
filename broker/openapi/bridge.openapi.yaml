@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info:
+  title: Codex Blender Broker
+  version: 0.1.0
+servers:
+  - url: https://your-pod-id-8080.proxy.runpod.net
+paths:
+  /health:
+    get:
+      summary: Broker health probe
+      responses:
+        '200':
+          description: OK
+  /auth/bootstrap:
+    post:
+      summary: Exchange bootstrap secret for a short-lived agent token
+      responses:
+        '200':
+          description: Token issued
+  /snapshots:
+    post:
+      summary: Upload a tar.gz addon snapshot
+  /jobs:
+    post:
+      summary: Submit a Blender validation job
+  /jobs/{job_id}:
+    get:
+      summary: Get job status
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+  /jobs/{job_id}/artifacts:
+    get:
+      summary: List artifact files
+  /jobs/{job_id}/artifacts/{filename}:
+    get:
+      summary: Download one artifact file
+  /viewer/token:
+    post:
+      summary: Return viewer access metadata
