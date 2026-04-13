@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+set -euo pipefail
+
+cd /opt/codex/broker
+exec python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8080

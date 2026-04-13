@@ -24,10 +24,10 @@ RUN python3 -m pip install -r /opt/codex/requirements.txt
 
 COPY broker /opt/codex/broker
 COPY sandbox-runtime /opt/codex/sandbox-runtime
-COPY sandbox-image/start-all.sh /opt/codex/start-all.sh
+COPY sandbox-image/custom-cont-init.d/ /custom-cont-init.d/
+COPY sandbox-image/custom-services.d/ /custom-services.d/
 COPY sandbox-image/install_warp.sh /opt/codex/install_warp.sh
-RUN chmod +x /opt/codex/start-all.sh /opt/codex/install_warp.sh && /opt/codex/install_warp.sh
+RUN chmod +x /opt/codex/install_warp.sh /custom-cont-init.d/* /custom-services.d/* && /opt/codex/install_warp.sh
 
 WORKDIR /opt/codex/broker
 EXPOSE 8080 3001 22
-ENTRYPOINT ["/bin/bash", "/opt/codex/start-all.sh"]
