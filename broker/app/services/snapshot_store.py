@@ -51,3 +51,8 @@ def store_snapshot(*, upload: BinaryIO, base_sha: str, addon_root: str, module_n
 
 def snapshot_blob_path(snapshot_id: str) -> Path:
     return SNAPSHOT_DIR / f"{snapshot_id}.tar.gz"
+
+
+def load_snapshot_metadata(snapshot_id: str) -> dict:
+    meta_path = SNAPSHOT_DIR / f"{snapshot_id}.json"
+    return json.loads(meta_path.read_text(encoding="utf-8"))

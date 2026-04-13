@@ -4,6 +4,10 @@ PYTHON ?= python3
 broker-dev:
 	cd broker && $(PYTHON) -m uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 
+.PHONY: local-start
+local-start:
+	pwsh -File infra/local/start_local_stack.ps1
+
 .PHONY: runpod-deploy
 runpod-deploy:
 	$(PYTHON) infra/runpod/deploy_pod.py

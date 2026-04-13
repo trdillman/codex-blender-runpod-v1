@@ -1,0 +1,7 @@
+.local/
+broker/.venv/
+*.log
+*.pid
+__pycache__/
+*.pyc
+*.egg-info/
