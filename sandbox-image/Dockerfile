@@ -30,4 +30,4 @@ RUN chmod +x /opt/codex/start-all.sh /opt/codex/install_warp.sh && /opt/codex/in
 
 WORKDIR /opt/codex/broker
 EXPOSE 8080 3001 22
-CMD ["/bin/bash", "/opt/codex/start-all.sh"]
+ENTRYPOINT ["/bin/bash", "/opt/codex/start-all.sh"]
