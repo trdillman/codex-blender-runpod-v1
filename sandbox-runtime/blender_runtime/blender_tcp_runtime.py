@@ -5,7 +5,6 @@ import io
 import json
 import os
 import socket
-import threading
 import traceback
 from pathlib import Path
 
@@ -20,31 +19,18 @@ class BlenderRuntime:
     def __init__(self, host: str = HOST, port: int = PORT) -> None:
         self.host = host
         self.port = port
-        self.running = False
         self.sock: socket.socket | None = None
 
     def start(self) -> None:
-        if self.running:
-            return
-        self.running = True
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
         self.sock.listen(5)
-        self.sock.settimeout(1.0)
-        threading.Thread(target=self._loop, daemon=True).start()
         print(f"[runtime] listening on {self.host}:{self.port}")
-
-    def _loop(self) -> None:
         assert self.sock is not None
-        while self.running:
-            try:
-                client, _ = self.sock.accept()
-            except socket.timeout:
-                continue
-            except OSError:
-                break
-            threading.Thread(target=self._handle_client, args=(client,), daemon=True).start()
+        while True:
+            client, _ = self.sock.accept()
+            self._handle_client(client)
 
     def _handle_client(self, client: socket.socket) -> None:
         buffer = b""
@@ -58,20 +44,11 @@ class BlenderRuntime:
                     request = json.loads(buffer.decode("utf-8"))
                 except json.JSONDecodeError:
                     continue
-                response_holder = {}
-                event = threading.Event()
-
-                def _execute() -> None:
-                    try:
-                        response_holder["response"] = self.execute(request)
-                    except Exception as exc:  # noqa: BLE001
-                        response_holder["response"] = {"status": "error", "message": str(exc), "traceback": traceback.format_exc()}
-                    finally:
-                        event.set()
-
-                bpy.app.timers.register(_execute, first_interval=0.0)
-                event.wait()
-                client.sendall(json.dumps(response_holder["response"]).encode("utf-8"))
+                try:
+                    response = self.execute(request)
+                except Exception as exc:  # noqa: BLE001
+                    response = {"status": "error", "message": str(exc), "traceback": traceback.format_exc()}
+                client.sendall(json.dumps(response).encode("utf-8"))
                 break
         finally:
             with contextlib.suppress(Exception):

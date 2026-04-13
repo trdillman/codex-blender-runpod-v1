@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import shutil
 import tarfile
 from pathlib import Path
 
 from local_runtime_client import RuntimeClient
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+ENSURE_RUNTIME_SCRIPT = PROJECT_ROOT / "ensure_blender_running.sh"
 
 
 def parse_args() -> argparse.Namespace:
@@ -26,6 +31,18 @@ def main() -> int:
     artifact_dir = Path(args.artifact_dir)
     artifact_dir.mkdir(parents=True, exist_ok=True)
     checks = json.loads(args.checks_json)
+
+    ensure_runtime = subprocess.run(
+        [str(ENSURE_RUNTIME_SCRIPT)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    (artifact_dir / "ensure_runtime.stdout.log").write_text(ensure_runtime.stdout, encoding="utf-8")
+    (artifact_dir / "ensure_runtime.stderr.log").write_text(ensure_runtime.stderr, encoding="utf-8")
+    if ensure_runtime.returncode != 0:
+        raise SystemExit(f"failed to ensure blender runtime: {ensure_runtime.stderr.strip() or ensure_runtime.stdout.strip() or ensure_runtime.returncode}")
+
     runtime = RuntimeClient()
 
     snapshot_extract_root = artifact_dir / "snapshot"
